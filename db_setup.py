@@ -1,40 +1,39 @@
-from db_connection import connect_db
-# Importing functions and classes from backend modules
-
-
+from backend.db_connection import connect_db
 
 def initialize_database():
-    db = connect_db()
-    cursor = db.cursor()
+    connection = connect_db()
+    cursor = connection.cursor()
 
+    # Create tables
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS Students (
-            student_id VARCHAR(10) PRIMARY KEY,
+        CREATE TABLE IF NOT EXISTS students (
+            id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(100),
-            department VARCHAR(50),
-            year INT,
-            password VARCHAR(64)
+            age INT,
+            grade VARCHAR(10)
         )
     """)
-
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS Attendance (
-            student_id VARCHAR(10),
+        CREATE TABLE IF NOT EXISTS attendance (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            student_id INT,
             attendance_percentage FLOAT,
-            FOREIGN KEY (student_id) REFERENCES Students(student_id)
+            FOREIGN KEY (student_id) REFERENCES students(id)
         )
     """)
-
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS SemesterMarks (
-            student_id VARCHAR(10),
+        CREATE TABLE IF NOT EXISTS semester_marks (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            student_id INT,
             semester INT,
-            year INT,
-            marks_obtained FLOAT,
-            max_marks FLOAT,
-            FOREIGN KEY (student_id) REFERENCES Students(student_id)
+            marks FLOAT,
+            FOREIGN KEY (student_id) REFERENCES students(id)
         )
     """)
+    connection.commit()
+    cursor.close()
+    connection.close()
+    print("Database initialized successfully.")
 
-    db.commit()
-    db.close()
+if __name__ == "__main__":
+    initialize_database()
